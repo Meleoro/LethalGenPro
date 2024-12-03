@@ -15,7 +15,7 @@ public class GenProManager : MonoBehaviour
     public int currentFloorIndex;
     
     [Header("Private Infos")] 
-    private Room[] generatedRooms;
+    private List<Room> generatedRooms;
     private Corridor[] generatedCorridors;
     
     [Header("References")]
@@ -50,14 +50,15 @@ public class GenProManager : MonoBehaviour
         roomCalculators = new RoomCalculator[data.floorNumber];
         corridorCalculators = new CorridorCalculator[data.floorNumber];
         pathCalculators = new PathCalculator[data.floorNumber];
-
-        List<Room> previousFloorStairs = new List<Room>();
+        generatedRooms = new List<Room>();
         
         for (int i = 0; i < data.floorNumber; i++)
         {
+            StartNewFloor();
+            
             currentFloorIndex = i;
             
-            roomCalculators[i] = new RoomCalculator(data, previousFloorStairs, i != data.floorNumber - 1);
+            roomCalculators[i] = new RoomCalculator(data, generatedRooms, i != data.floorNumber - 1);
             corridorCalculators[i] = new CorridorCalculator();
             pathCalculators[i] = new PathCalculator();
             
@@ -69,9 +70,27 @@ public class GenProManager : MonoBehaviour
 
     private void StartNewFloor()
     {
-        for (int i = 0; i < corridorSpots.Count; i++)
+        corridorSpots.Clear();
+
+        // We remove every rooms except the ones with stairs on the previous floor
+        for (int i = generatedRooms.Count - 1; i >= 0; i--)
         {
-            if(corridorSpots[i].)
+            CorridorSpot[] roomCorridorSpots = generatedRooms[i].corridorSpots;
+            bool canBeRemoved = true;
+
+            for (int j = 0; j < roomCorridorSpots.Length; j++)
+            {
+                if (!roomCorridorSpots[j].hasCorridor)
+                {
+                    canBeRemoved = false;
+                    break;
+                }
+            }
+
+            if (canBeRemoved)
+            {
+                generatedRooms.RemoveAt(i);
+            }
         }
     }
 
@@ -83,7 +102,7 @@ public class GenProManager : MonoBehaviour
         GenerateRooms();
         
         // We generate the corridors
-        corridorsPositions =  corridorCalculators[currentFloorIndex].GenerateCorridorPositions(generatedRooms);
+        corridorsPositions =  corridorCalculators[currentFloorIndex].GenerateCorridorPositions(generatedRooms.ToArray());
         generatedCorridors = new Corridor[corridorsPositions.Count];
         
         for (int i = 0; i < corridorsPositions.Count; i++)
@@ -100,16 +119,15 @@ public class GenProManager : MonoBehaviour
     {
         Room[] rooms;
         Vector3[] roomPositions;
-        
+
         (rooms, roomPositions) = roomCalculators[currentFloorIndex].GenerateRoomPositions();
-        generatedRooms = new Room[rooms.Length];
         
         for (int i = 0; i < rooms.Length; i++)
         {
             Room newRoom = Instantiate(rooms[i], roomPositions[i], Quaternion.Euler(0, 0, 0));
-            generatedRooms[i] = newRoom;
-            generatedRooms[i].GenerateCorridorSpots();
-            generatedRooms[i].AddGroundTilesToPathfinding();
+            generatedRooms.Add(newRoom);
+            generatedRooms[generatedRooms.Count - 1].GenerateCorridorSpots();
+            generatedRooms[generatedRooms.Count - 1].AddGroundTilesToPathfinding();
             corridorSpots.AddRange(newRoom.GetCorridorsSpots());
         }
     }

@@ -54,7 +54,7 @@ public class RoomCalculator
         if (previousFloorStairRooms.Length == 0)
         {
             rooms[0] = startRoom;
-            roomPositions[0] = new Vector3(2000, GenProManager.Instance.currentFloorIndex * 2, 2000);
+            roomPositions[0] = new Vector3(2000, GenProManager.Instance.currentFloorIndex * 4, 2000);
             takenPositions.Add(roomPositions[0]);
         }
         else

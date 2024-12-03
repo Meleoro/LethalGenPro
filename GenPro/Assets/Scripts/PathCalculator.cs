@@ -88,7 +88,7 @@ public class PathCalculator
         
         while (true)
         {
-            finalPath.Add(new Vector3(currentTile.coord.x * 2, 0, currentTile.coord.y * 2));
+            finalPath.Add(new Vector3(currentTile.coord.x * 2, GenProManager.Instance.currentFloorIndex * 4, currentTile.coord.y * 2));
             if (currentTile == start)
             {
                 finalPath.Reverse();

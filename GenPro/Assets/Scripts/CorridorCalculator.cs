@@ -55,6 +55,8 @@ public class CorridorCalculator
         for (int i = 0; i < room.corridorSpots.Length; i++)
         {
             if (room.corridorSpots[i].hasCorridor) continue;
+
+            if (room.corridorSpots[i].transform.position.y != GenProManager.Instance.currentFloorIndex * 4 + 0.5f) continue;
             
             Vector3 pos1 = room.corridorSpots[i].transform.forward + room.corridorSpots[i].transform.position;
             Vector3 pos2 = Vector3.zero;
