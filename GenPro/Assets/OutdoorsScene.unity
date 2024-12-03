@@ -177,6 +177,7 @@ MonoBehaviour:
   - {fileID: 3087748527995878274, guid: 468f6ede74de5f24ebaf708c7fb4082b, type: 3}
   possibleStairsRooms:
   - {fileID: 3087748527995878274, guid: 4bb018acb767f814bbe152deaa8a9ef7, type: 3}
+  - {fileID: 3087748527995878274, guid: 03508d5b6550521459595ae7f394da60, type: 3}
   startRoom: {fileID: 3087748527995878274, guid: 80a7cf8d55d68894796838040d7b8204, type: 3}
   corridor: {fileID: 5878583539233378043, guid: 6dc1916ad4b444e488620670ac0276d7, type: 3}
   floorParent: {fileID: 165092783843024121, guid: 4583d96e716533b4f822dc108378fc7f, type: 3}
