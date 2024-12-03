@@ -70,7 +70,6 @@ public class CorridorCalculator
                 counter++;
                 if (counter > 20)
                 {
-                    Debug.Log(12);
                     pos2 = corridorPositions[Random.Range(0, corridorPositions.Count)];
                     break;
                 }

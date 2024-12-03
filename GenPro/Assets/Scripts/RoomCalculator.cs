@@ -60,6 +60,8 @@ public class RoomCalculator
         }
         else
         {
+            Debug.Log(previousFloorStairRooms.Length);
+            
             for (int i = 0; i < previousFloorStairRooms.Length; i++)
             {
                 takenPositions.Add(previousFloorStairRooms[i].transform.position + new Vector3Int(0, 4, 0));

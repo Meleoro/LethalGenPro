@@ -54,15 +54,15 @@ public class GenProManager : MonoBehaviour
         
         for (int i = 0; i < data.floorNumber; i++)
         {
-            StartNewFloor();
-            
             currentFloorIndex = i;
+            
+            pathCalculators[i] = new PathCalculator();
+            pathCalculators[i].InitialisePathCalculator();
+            
+            StartNewFloor();
             
             roomCalculators[i] = new RoomCalculator(data, generatedRooms, i != data.floorNumber - 1);
             corridorCalculators[i] = new CorridorCalculator();
-            pathCalculators[i] = new PathCalculator();
-            
-            pathCalculators[i].InitialisePathCalculator();
             
             GenerateFloor();
         }
@@ -90,7 +90,6 @@ public class GenProManager : MonoBehaviour
             if (canBeRemoved)
             {
                 generatedRooms.RemoveAt(i);
-                Debug.Log("Removed");
             }
             else
             {
