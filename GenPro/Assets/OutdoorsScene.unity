@@ -163,7 +163,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf1da2a30521e29488c1a9976b585810, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  data: {fileID: 11400000, guid: f36c45f240ce9ff4187de71b71c4ff03, type: 2}
+  data: {fileID: 11400000, guid: e50495a15d7f9204ca4b2f3f00e73162, type: 2}
   possibleRooms:
   - {fileID: 3087748527995878274, guid: b6839de30ae11ef40a6557d36bb3367a, type: 3}
   - {fileID: 3087748527995878274, guid: 9680eb33791a38b44a7191fd5bb8e1d0, type: 3}

@@ -10,6 +10,9 @@ public class GenProManager : MonoBehaviour
     [Header("Data")] 
     [SerializeField] private GlobalGenProData data;
 
+    [Header("Public Infos")]
+    public List<Transform> corridorSpot;
+    
     [Header("Private Infos")] 
     private Room[] generatedRooms;
     private Corridor[] generatedCorridors;
@@ -61,6 +64,7 @@ public class GenProManager : MonoBehaviour
             generatedRooms[i] = newRoom;
             generatedRooms[i].GenerateCorridorSpots();
             generatedRooms[i].AddGroundTilesToPathfinding();
+            corridorSpot.AddRange(newRoom.GetCorridorsSpots());
         }
         
         // We generate the corridors
@@ -71,6 +75,7 @@ public class GenProManager : MonoBehaviour
         {
             Corridor newCorridor = Instantiate(corridor, corridorsPositions[i], Quaternion.Euler(0, 0, 0));
             generatedCorridors[i] = newCorridor;
+            generatedCorridors[i].ActualiseWalls();
         }
         
         _corridorCalculator.ManageCorridorsNeighbors(generatedCorridors.ToList());

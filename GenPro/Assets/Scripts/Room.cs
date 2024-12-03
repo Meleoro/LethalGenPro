@@ -12,6 +12,13 @@ public class Room : MonoBehaviour
     [SerializeField] private Transform groundTilesParent;
 
 
+    public List<Transform> GetCorridorsSpots()
+    {
+        List<Transform> transforms = new List<Transform>(corridorSpotsParent.GetComponentsInChildren<Transform>());
+        transforms.Remove(corridorSpotsParent);
+        return transforms;
+    }
+
     public void GenerateCorridorSpots()
     {
         List<Transform> transforms = new List<Transform>(corridorSpotsParent.GetComponentsInChildren<Transform>());

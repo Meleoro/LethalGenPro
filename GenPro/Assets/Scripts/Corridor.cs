@@ -12,13 +12,24 @@ public class Corridor : MonoBehaviour
     public GameObject leftWall;
     public GameObject rightWall;
 
-    public void AddNeighbor(Corridor corridor)
+    public void ActualiseWalls()
     {
-        neighbors.Add(corridor);
-    }
-
-    private void ActualiseWalls()
-    {
-        
-    }
+        List<Transform> corridorSpots = GenProManager.Instance.corridorSpot;
+        for (int i = 0; i < corridorSpots.Count; i++)
+        {
+            if (corridorSpots[i].position == upWall.transform.position)
+            {
+                upWall.SetActive(false);
+            } else if (corridorSpots[i].position == downWall.transform.position)
+            {
+                downWall.SetActive(false);
+            } else if (corridorSpots[i].position == leftWall.transform.position)
+            {
+                leftWall.SetActive(false);
+            } else if (corridorSpots[i].position == rightWall.transform.position)
+            {
+                rightWall.SetActive(false);
+            }
+        }
+     }
 }
