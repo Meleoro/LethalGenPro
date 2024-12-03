@@ -62,6 +62,7 @@ public class CorridorCalculator
             
             Vector3 pos1 = room.corridorSpots[i].transform.forward + room.corridorSpots[i].transform.position;
             Vector3 pos2 = Vector3.zero;
+            CorridorSpot wantedSpot;
             
             int counter = 0;
             
@@ -71,7 +72,12 @@ public class CorridorCalculator
                 if (counter > 20)
                 {
                     pos2 = corridorPositions[Random.Range(0, corridorPositions.Count)];
-                    break;
+                    
+                    List<Vector3> testPath = GenProManager.Instance.pathCalculators[GenProManager.Instance.currentFloorIndex]
+                        .GetPath(pos1, pos2);
+                    
+                    if(testPath.Count != 0 || counter == 50)
+                        break;
                 }
                 
                 Room pickedRoom = otherRooms[Random.Range(0, otherRooms.Length)];
@@ -82,21 +88,37 @@ public class CorridorCalculator
                 for (int j = 0; j < pickedRoom.corridorSpots.Length; j++)
                 {
                     if (pickedRoom.corridorSpots[j].hasCorridor) continue;
-                    if (pickedRoom.corridorSpots[j].transform.position.y >
-                        1 + GenProManager.Instance.currentFloorIndex * 4) continue;
+                    if (pickedRoom.corridorSpots[j].transform.position.y > 1 + GenProManager.Instance.currentFloorIndex * 4) continue;
 
                     pos2 = pickedRoom.corridorSpots[j].transform.position + pickedRoom.corridorSpots[j].transform.forward;
-                    pickedRoom.corridorSpots[j].hasCorridor = true;
+                    wantedSpot = pickedRoom.corridorSpots[j];
                     found = true;
                     break;
                 }
 
-                if (found) break;
+                if (found)
+                {
+                    List<Vector3> testPath = GenProManager.Instance.pathCalculators[GenProManager.Instance.currentFloorIndex]
+                        .GetPath(pos1, pos2);
+                    
+                    if(testPath.Count != 0)
+                        break;
+                }
             }
 
             room.corridorSpots[i].hasCorridor = true;
-            
-            tilePositions.AddRange(GenProManager.Instance.pathCalculators[GenProManager.Instance.currentFloorIndex].GetPath(pos1, pos2));
+
+            List<Vector3> path = GenProManager.Instance.pathCalculators[GenProManager.Instance.currentFloorIndex].GetPath(pos1, pos2);
+            if (path.Count == 0)
+            {
+                room.ReplaceCorridorSpot(i);
+                wantedSpot.hasCorridor = false;
+            }
+            else
+            {
+                wantedSpot.hasCorridor = true;
+                tilePositions.AddRange(path);
+            }
         }
         
         return tilePositions;

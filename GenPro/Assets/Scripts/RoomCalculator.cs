@@ -13,6 +13,7 @@ public class RoomCalculator
 
     [Header("Private Infos")] 
     private List<Vector3> takenPositions = new List<Vector3>();
+    private List<Vector3Int> takenTilesPositions = new List<Vector3Int>();
     private List<int> stairRoomIndexes = new List<int>();
 
     
@@ -57,14 +58,15 @@ public class RoomCalculator
             rooms[0] = startRoom;
             roomPositions[0] = new Vector3(2000, GenProManager.Instance.currentFloorIndex * 4, 2000);
             takenPositions.Add(roomPositions[0]);
+            
+            AddGroundTiles(roomPositions[0], rooms[0]);
         }
         else
         {
-            Debug.Log(previousFloorStairRooms.Length);
-            
             for (int i = 0; i < previousFloorStairRooms.Length; i++)
             {
                 takenPositions.Add(previousFloorStairRooms[i].transform.position + new Vector3Int(0, 4, 0));
+                AddGroundTiles(previousFloorStairRooms[i].transform.position, previousFloorStairRooms[i]);
             }
         }
 
@@ -72,8 +74,10 @@ public class RoomCalculator
         for (int i = startIndex; i < roomAmount; i++)
         {
             Room currentRoom = GetCurrentRoom(i);
-            Vector3 currentPos = GetCurrentRoomPos();
+            Vector3 currentPos = GetCurrentRoomPos(currentRoom);
 
+            AddGroundTiles(currentPos, currentRoom);
+            
             rooms[i] = currentRoom;
             roomPositions[i] = currentPos;
             takenPositions.Add(roomPositions[i]);
@@ -94,7 +98,7 @@ public class RoomCalculator
     }
 
     
-    private Vector3 GetCurrentRoomPos()
+    private Vector3 GetCurrentRoomPos(Room wantedRoom)
     {
         int counter = 0;
         
@@ -107,7 +111,7 @@ public class RoomCalculator
                 return new Vector3();
             }
 
-            float amplitude = Random.Range(data.roomSeparationMinDistance, data.roomSeparationMaxDistance + 1);
+            float amplitude = Random.Range(data.roomSeparationMinDistance + counter, data.roomSeparationMaxDistance + counter);
             Vector3 direction = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f));
             direction.Normalize();
             
@@ -116,7 +120,7 @@ public class RoomCalculator
             finalPos = new Vector3((int)finalPos.x, (int)finalPos.y, (int)finalPos.z);
             finalPos += new Vector3(finalPos.x % 2, finalPos.y % 2, finalPos.z % 2);
                 
-            if (VerifyRoomPos(finalPos))
+            if (VerifyRoomPos(finalPos, wantedRoom))
             {
                 return finalPos;
             }
@@ -124,18 +128,45 @@ public class RoomCalculator
     }
     
 
-    private bool VerifyRoomPos(Vector3 wantedRoomPos)
+    private bool VerifyRoomPos(Vector3 wantedRoomPos, Room wantedRoom)
     {
-        for (int i = 0; i < takenPositions.Count; i++)
-        {
-            float dist = Vector2.Distance(new Vector2(wantedRoomPos.x, wantedRoomPos.z), new Vector2(takenPositions[i].x, takenPositions[i].z));
+        Transform[] roomTiles = wantedRoom.GetGroundTiles();
 
-            if (dist < data.roomSeparationMinDistance)
+        List<Vector3Int> roomTilePositions = new List<Vector3Int>();
+        for (int i = 0; i < roomTiles.Length; i++)
+        {
+            Vector3 tilePos = wantedRoomPos + roomTiles[i].localPosition;
+            roomTilePositions.Add(new Vector3Int((int)tilePos.x, 0, (int)tilePos.z));
+        }
+
+        for (int i = 0; i < roomTilePositions.Count; i++)
+        {
+            for (int j = 0; j < takenTilesPositions.Count; j++)
             {
-                return false;
+                if (roomTilePositions[i] == takenTilesPositions[j])
+                {
+                    return false;
+                }
+
+                if (Vector2.Distance(new Vector2(roomTilePositions[i].x, roomTilePositions[i].z),
+                        new Vector2(takenTilesPositions[j].x, takenTilesPositions[j].z)) < 7)
+                {
+                    return false;
+                }
             }
         }
         
         return true;
+    }
+
+    private void AddGroundTiles(Vector3 pos, Room room)
+    {
+        Transform[] roomTiles = room.GetGroundTiles();
+
+        for (int i = 0; i < roomTiles.Length; i++)
+        {
+            Vector3 tilePos = pos + roomTiles[i].localPosition;
+            takenTilesPositions.Add(new Vector3Int((int)tilePos.x, 0, (int)tilePos.z));
+        }
     }
 }

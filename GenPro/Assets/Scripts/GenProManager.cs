@@ -17,12 +17,14 @@ public class GenProManager : MonoBehaviour
     [Header("Private Infos")] 
     private List<Room> generatedRooms;
     private Corridor[] generatedCorridors;
+    private Transform currentFloorParent;
     
     [Header("References")]
     public Room[] possibleRooms;
     public Room[] possibleStairsRooms;
     public Room startRoom;
     [SerializeField] private Corridor corridor;
+    [SerializeField] private Transform floorParent;
     private RoomCalculator[] roomCalculators;
     private CorridorCalculator[] corridorCalculators;
     public PathCalculator[] pathCalculators;
@@ -54,6 +56,7 @@ public class GenProManager : MonoBehaviour
         
         for (int i = 0; i < data.floorNumber; i++)
         {
+            currentFloorParent = Instantiate(floorParent);
             currentFloorIndex = i;
             
             pathCalculators[i] = new PathCalculator();
@@ -93,7 +96,7 @@ public class GenProManager : MonoBehaviour
             }
             else
             {
-                generatedRooms[i].AddGroundTilesToPathfinding();
+                generatedRooms[i].AddGroundTilesToPathfinding(true);
             }
         }
     }
@@ -111,7 +114,7 @@ public class GenProManager : MonoBehaviour
         
         for (int i = 0; i < corridorsPositions.Count; i++)
         {
-            Corridor newCorridor = Instantiate(corridor, corridorsPositions[i], Quaternion.Euler(0, 0, 0));
+            Corridor newCorridor = Instantiate(corridor, corridorsPositions[i], Quaternion.Euler(0, 0, 0), currentFloorParent);
             generatedCorridors[i] = newCorridor;
             generatedCorridors[i].ActualiseWalls();
         }
@@ -128,7 +131,7 @@ public class GenProManager : MonoBehaviour
         
         for (int i = 0; i < rooms.Length; i++)
         {
-            Room newRoom = Instantiate(rooms[i], roomPositions[i], Quaternion.Euler(0, 0, 0));
+            Room newRoom = Instantiate(rooms[i], roomPositions[i], Quaternion.Euler(0, 0, 0), currentFloorParent);
             generatedRooms.Add(newRoom);
             generatedRooms[generatedRooms.Count - 1].GenerateCorridorSpots();
             generatedRooms[generatedRooms.Count - 1].AddGroundTilesToPathfinding();

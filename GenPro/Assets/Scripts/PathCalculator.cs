@@ -36,8 +36,16 @@ public class PathCalculator
         
         openList.Add(start);
 
+        int counter = 0;
+
         while (openList.Count != 0)
         {
+            counter++;
+            if (counter > 15)
+            {
+                return new List<Vector3>();
+            }
+            
             // We select the best tile of the open list
             int bestDist = 2000;
             int bestIndex = 0;

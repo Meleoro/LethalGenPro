@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f4ed7826be0e424aab22d1b416045b8, type: 3}
   m_Name: Global1
   m_EditorClassIdentifier: 
-  minRoomNumber: 5
-  maxRoomNumber: 10
-  roomSeparationMinDistance: 20
-  roomSeparationMaxDistance: 30
-  floorNumber: 3
+  minRoomNumber: 10
+  maxRoomNumber: 15
+  roomSeparationMinDistance: 5
+  roomSeparationMaxDistance: 10
+  floorNumber: 2
   minStairRoomsNumber: 3
-  maxStairRoomsNumber: 5
+  maxStairRoomsNumber: 4
