@@ -47,12 +47,13 @@ public class RoomCalculator
                 stairRoomIndexes.Add(pickedIndex);
             }
         }
-        
-        
-        
+
+        int startIndex = 0;
+
         // We generate the spawn
-        if (previousFloorStairRooms.Length == 0)
+        if (GenProManager.Instance.currentFloorIndex == 0)
         {
+            startIndex++;
             rooms[0] = startRoom;
             roomPositions[0] = new Vector3(2000, GenProManager.Instance.currentFloorIndex * 4, 2000);
             takenPositions.Add(roomPositions[0]);
@@ -61,12 +62,12 @@ public class RoomCalculator
         {
             for (int i = 0; i < previousFloorStairRooms.Length; i++)
             {
-                takenPositions.Add(previousFloorStairRooms[i].transform.position + new Vector3Int(0, 2, 0));
+                takenPositions.Add(previousFloorStairRooms[i].transform.position + new Vector3Int(0, 4, 0));
             }
         }
 
         // We generate all the other rooms
-        for (int i = 1; i < roomAmount; i++)
+        for (int i = startIndex; i < roomAmount; i++)
         {
             Room currentRoom = GetCurrentRoom(i);
             Vector3 currentPos = GetCurrentRoomPos();

@@ -55,8 +55,10 @@ public class CorridorCalculator
         for (int i = 0; i < room.corridorSpots.Length; i++)
         {
             if (room.corridorSpots[i].hasCorridor) continue;
-
-            if (room.corridorSpots[i].transform.position.y != GenProManager.Instance.currentFloorIndex * 4 + 0.5f) continue;
+            if (room.corridorSpots[i].transform.position.y > 1 + GenProManager.Instance.currentFloorIndex * 4)
+            {
+                continue;
+            }
             
             Vector3 pos1 = room.corridorSpots[i].transform.forward + room.corridorSpots[i].transform.position;
             Vector3 pos2 = Vector3.zero;
@@ -68,6 +70,7 @@ public class CorridorCalculator
                 counter++;
                 if (counter > 20)
                 {
+                    Debug.Log(12);
                     pos2 = corridorPositions[Random.Range(0, corridorPositions.Count)];
                     break;
                 }
@@ -80,6 +83,8 @@ public class CorridorCalculator
                 for (int j = 0; j < pickedRoom.corridorSpots.Length; j++)
                 {
                     if (pickedRoom.corridorSpots[j].hasCorridor) continue;
+                    if (pickedRoom.corridorSpots[j].transform.position.y >
+                        1 + GenProManager.Instance.currentFloorIndex * 4) continue;
 
                     pos2 = pickedRoom.corridorSpots[j].transform.position + pickedRoom.corridorSpots[j].transform.forward;
                     pickedRoom.corridorSpots[j].hasCorridor = true;

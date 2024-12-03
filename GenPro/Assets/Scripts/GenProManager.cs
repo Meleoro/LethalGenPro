@@ -72,7 +72,7 @@ public class GenProManager : MonoBehaviour
     {
         corridorSpots.Clear();
 
-        // We remove every rooms except the ones with stairs on the previous floor
+        // We remove every room except the ones with stairs on the previous floor
         for (int i = generatedRooms.Count - 1; i >= 0; i--)
         {
             CorridorSpot[] roomCorridorSpots = generatedRooms[i].corridorSpots;
@@ -83,13 +83,18 @@ public class GenProManager : MonoBehaviour
                 if (!roomCorridorSpots[j].hasCorridor)
                 {
                     canBeRemoved = false;
-                    break;
+                    corridorSpots.Add(roomCorridorSpots[j].transform);
                 }
             }
 
             if (canBeRemoved)
             {
                 generatedRooms.RemoveAt(i);
+                Debug.Log("Removed");
+            }
+            else
+            {
+                generatedRooms[i].AddGroundTilesToPathfinding();
             }
         }
     }
