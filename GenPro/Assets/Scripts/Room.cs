@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class Room : MonoBehaviour
 {
+    [Header("Parameters")] 
+    public bool isStairRoom;
+    
     [Header("Public Infos")] 
     public CorridorSpot[] corridorSpots;
     
@@ -40,7 +43,7 @@ public class Room : MonoBehaviour
         
         for (int i = 0; i < transforms.Count; i++)
         {
-            GenProManager.Instance._pathCalculator.AddBlockedTile(transforms[i].position);
+            GenProManager.Instance.pathCalculators[GenProManager.Instance.currentFloorIndex].AddBlockedTile(transforms[i].position);
         }
     }
 }

@@ -90,7 +90,7 @@ public class CorridorCalculator
 
             room.corridorSpots[i].hasCorridor = true;
             
-            tilePositions.AddRange(GenProManager.Instance._pathCalculator.GetPath(pos1, pos2));
+            tilePositions.AddRange(GenProManager.Instance.pathCalculators[GenProManager.Instance.currentFloorIndex].GetPath(pos1, pos2));
         }
         
         return tilePositions;

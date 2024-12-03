@@ -47,6 +47,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 154603bf4bd46734b8fc072cdba750c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isStairRoom: 1
   corridorSpotsParent: {fileID: 6453134395077130843}
   groundTilesParent: {fileID: 6525325561414704190}
 --- !u!1 &1222131020999286421

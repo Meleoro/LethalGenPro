@@ -14,7 +14,7 @@ public class Corridor : MonoBehaviour
 
     public void ActualiseWalls()
     {
-        List<Transform> corridorSpots = GenProManager.Instance.corridorSpot;
+        List<Transform> corridorSpots = GenProManager.Instance.corridorSpots;
         for (int i = 0; i < corridorSpots.Count; i++)
         {
             if (corridorSpots[i].position == upWall.transform.position)
@@ -31,5 +31,5 @@ public class Corridor : MonoBehaviour
                 rightWall.SetActive(false);
             }
         }
-     }
+    }
 }

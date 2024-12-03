@@ -6,17 +6,25 @@ public class RoomCalculator
     [Header("References / Parameters")]
     private GlobalGenProData data;
     private Room[] possibleRooms;
+    private Room[] possibleStairsRooms;
+    private Room[] previousFloorStairRooms;
     private Room startRoom;
+    private bool mustGenerateStairs;
 
     [Header("Private Infos")] 
     private List<Vector3> takenPositions = new List<Vector3>();
+    private List<int> stairRoomIndexes = new List<int>();
 
     
-    public RoomCalculator(Room[] possibleRooms, Room startRoom, GlobalGenProData data)
+    public RoomCalculator(GlobalGenProData data, List<Room> previousFloorStairRooms, bool haveFloorUpside = false)
     {
-        this.possibleRooms = possibleRooms;
-        this.startRoom = startRoom;
+        possibleRooms = GenProManager.Instance.possibleRooms;
+        possibleStairsRooms = GenProManager.Instance.possibleStairsRooms;
+        startRoom = GenProManager.Instance.startRoom;
         this.data = data;
+
+        this.previousFloorStairRooms = previousFloorStairRooms.ToArray();
+        mustGenerateStairs = haveFloorUpside;
     }
     
     
@@ -27,15 +35,40 @@ public class RoomCalculator
         Room[] rooms = new Room[roomAmount];
         Vector3[] roomPositions = new Vector3[roomAmount];
         
-        // We generate the spawn
-        rooms[0] = startRoom;
-        roomPositions[0] = new Vector3(2000, 0, 2000);
-        takenPositions.Add(roomPositions[0]);
+        // We select at which indexes we will spawn stairs
+        if (mustGenerateStairs)
+        {
+            int stairRoomNumber = Random.Range(data.minStairRoomsNumber, data.maxStairRoomsNumber + 1);
+            while (stairRoomIndexes.Count != stairRoomNumber)
+            {
+                int pickedIndex = Random.Range(1, roomAmount);
+                if (stairRoomIndexes.Contains(pickedIndex)) continue;
+                
+                stairRoomIndexes.Add(pickedIndex);
+            }
+        }
         
+        
+        
+        // We generate the spawn
+        if (previousFloorStairRooms.Length == 0)
+        {
+            rooms[0] = startRoom;
+            roomPositions[0] = new Vector3(2000, GenProManager.Instance.currentFloorIndex * 2, 2000);
+            takenPositions.Add(roomPositions[0]);
+        }
+        else
+        {
+            for (int i = 0; i < previousFloorStairRooms.Length; i++)
+            {
+                takenPositions.Add(previousFloorStairRooms[i].transform.position + new Vector3Int(0, 2, 0));
+            }
+        }
+
         // We generate all the other rooms
         for (int i = 1; i < roomAmount; i++)
         {
-            Room currentRoom = GetCurrentRoom();
+            Room currentRoom = GetCurrentRoom(i);
             Vector3 currentPos = GetCurrentRoomPos();
 
             rooms[i] = currentRoom;
@@ -47,8 +80,13 @@ public class RoomCalculator
     }
 
     
-    private Room GetCurrentRoom()
+    private Room GetCurrentRoom(int currentRoomIndex)
     {
+        if (stairRoomIndexes.Contains(currentRoomIndex))
+        {
+            return possibleStairsRooms[Random.Range(0, possibleStairsRooms.Length)];
+        }
+        
         return possibleRooms[Random.Range(0, possibleRooms.Length)];
     }
 

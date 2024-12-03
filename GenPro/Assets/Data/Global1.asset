@@ -16,4 +16,6 @@ MonoBehaviour:
   maxRoomNumber: 25
   roomSeparationMinDistance: 20
   roomSeparationMaxDistance: 30
-  stairsNumber: 1
+  floorNumber: 2
+  minStairRoomsNumber: 4
+  maxStairRoomsNumber: 6

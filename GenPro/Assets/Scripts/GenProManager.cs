@@ -11,19 +11,21 @@ public class GenProManager : MonoBehaviour
     [SerializeField] private GlobalGenProData data;
 
     [Header("Public Infos")]
-    public List<Transform> corridorSpot;
+    public List<Transform> corridorSpots;
+    public int currentFloorIndex;
     
     [Header("Private Infos")] 
     private Room[] generatedRooms;
     private Corridor[] generatedCorridors;
     
     [Header("References")]
-    [SerializeField] private Room[] possibleRooms;
-    [SerializeField] private Room startRoom;
+    public Room[] possibleRooms;
+    public Room[] possibleStairsRooms;
+    public Room startRoom;
     [SerializeField] private Corridor corridor;
-    private RoomCalculator _roomCalculator;
-    private CorridorCalculator _corridorCalculator;
-    public PathCalculator _pathCalculator;
+    private RoomCalculator[] roomCalculators;
+    private CorridorCalculator[] corridorCalculators;
+    public PathCalculator[] pathCalculators;
 
 
     private void Awake()
@@ -40,35 +42,48 @@ public class GenProManager : MonoBehaviour
 
     private void Start()
     {
-        _roomCalculator = new RoomCalculator(possibleRooms, startRoom, data);
-        _corridorCalculator = new CorridorCalculator();
-        _pathCalculator = new PathCalculator();
-        
-        _pathCalculator.InitialisePathCalculator();
         GenerateMap();
     }
 
     private void GenerateMap()
     {
-        Room[] rooms;
-        Vector3[] roomPositions;
-        List<Vector3> corridorsPositions;
+        roomCalculators = new RoomCalculator[data.floorNumber];
+        corridorCalculators = new CorridorCalculator[data.floorNumber];
+        pathCalculators = new PathCalculator[data.floorNumber];
+
+        List<Room> previousFloorStairs = new List<Room>();
         
-        // We generate the rooms
-        (rooms, roomPositions) = _roomCalculator.GenerateRoomPositions();
-        generatedRooms = new Room[rooms.Length];
-        
-        for (int i = 0; i < rooms.Length; i++)
+        for (int i = 0; i < data.floorNumber; i++)
         {
-            Room newRoom = Instantiate(rooms[i], roomPositions[i], Quaternion.Euler(0, 0, 0));
-            generatedRooms[i] = newRoom;
-            generatedRooms[i].GenerateCorridorSpots();
-            generatedRooms[i].AddGroundTilesToPathfinding();
-            corridorSpot.AddRange(newRoom.GetCorridorsSpots());
+            currentFloorIndex = i;
+            
+            roomCalculators[i] = new RoomCalculator(data, previousFloorStairs, i != data.floorNumber - 1);
+            corridorCalculators[i] = new CorridorCalculator();
+            pathCalculators[i] = new PathCalculator();
+            
+            pathCalculators[i].InitialisePathCalculator();
+            
+            GenerateFloor();
         }
+    }
+
+    private void StartNewFloor()
+    {
+        for (int i = 0; i < corridorSpots.Count; i++)
+        {
+            if(corridorSpots[i].)
+        }
+    }
+
+    
+    private void GenerateFloor()
+    {
+        List<Vector3> corridorsPositions;
+
+        GenerateRooms();
         
         // We generate the corridors
-        corridorsPositions = _corridorCalculator.GenerateCorridorPositions(generatedRooms);
+        corridorsPositions =  corridorCalculators[currentFloorIndex].GenerateCorridorPositions(generatedRooms);
         generatedCorridors = new Corridor[corridorsPositions.Count];
         
         for (int i = 0; i < corridorsPositions.Count; i++)
@@ -78,9 +93,25 @@ public class GenProManager : MonoBehaviour
             generatedCorridors[i].ActualiseWalls();
         }
         
-        _corridorCalculator.ManageCorridorsNeighbors(generatedCorridors.ToList());
+        corridorCalculators[currentFloorIndex].ManageCorridorsNeighbors(generatedCorridors.ToList());
     }
-    
-    
+
+    private void GenerateRooms()
+    {
+        Room[] rooms;
+        Vector3[] roomPositions;
+        
+        (rooms, roomPositions) = roomCalculators[currentFloorIndex].GenerateRoomPositions();
+        generatedRooms = new Room[rooms.Length];
+        
+        for (int i = 0; i < rooms.Length; i++)
+        {
+            Room newRoom = Instantiate(rooms[i], roomPositions[i], Quaternion.Euler(0, 0, 0));
+            generatedRooms[i] = newRoom;
+            generatedRooms[i].GenerateCorridorSpots();
+            generatedRooms[i].AddGroundTilesToPathfinding();
+            corridorSpots.AddRange(newRoom.GetCorridorsSpots());
+        }
+    }
     
 }
