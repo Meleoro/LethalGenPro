@@ -9,6 +9,7 @@ public class Room : MonoBehaviour
     
     [Header("Public Infos")] 
     public CorridorSpot[] corridorSpots;
+    public bool isConnected;
     
     [Header("References")] 
     [SerializeField] private Transform corridorSpotsParent;

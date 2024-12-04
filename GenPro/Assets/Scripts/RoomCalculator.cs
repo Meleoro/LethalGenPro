@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class RoomCalculator
@@ -30,8 +31,10 @@ public class RoomCalculator
     
     
     // Returns the positions and prefab of the map rooms
-    public (Room[], Vector3[]) GenerateRoomPositions()
+    public async Task<(Room[], Vector3[])> GenerateRoomPositions()
     {
+        await Task.Yield();
+        
         int roomAmount = Random.Range(data.minRoomNumber, data.maxRoomNumber + 1);
         Room[] rooms = new Room[roomAmount];
         Vector3[] roomPositions = new Vector3[roomAmount];

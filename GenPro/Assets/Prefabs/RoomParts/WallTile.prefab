@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7415786706339801267}
   - component: {fileID: 4174527844185270342}
   - component: {fileID: 6821722123136969846}
+  - component: {fileID: 2261634643588666073}
   m_Layer: 0
   m_Name: WallTile
   m_TagString: Untagged
@@ -108,3 +109,25 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &2261634643588666073
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2142651733019332927}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08daefab6087beb4a8ca72041e4650fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  materialsPerStairs:
+  - {fileID: 2100000, guid: 0f851a4216207dc45adf903beaac792b, type: 2}
+  - {fileID: 2100000, guid: 05a8584161eb9474193d07609761d82a, type: 2}
+  - {fileID: 2100000, guid: cbeefd72a12c6f94d97296cf56120302, type: 2}
+  - {fileID: 2100000, guid: 427068562b02bfb499fd00c9c639dad1, type: 2}
+  - {fileID: 2100000, guid: 7fbd3af3b7d0d8e40a7e983e834d326f, type: 2}
+  - {fileID: 2100000, guid: 0d79eb794bea09446a0306f3e7cfd3ed, type: 2}
+  - {fileID: 2100000, guid: 007636751ebfd794c921b8ad79c1f671, type: 2}
+  - {fileID: 2100000, guid: dcbcd4ce258bcba419768f74f638b7ca, type: 2}
+  meshRenderer: {fileID: 4174527844185270342}

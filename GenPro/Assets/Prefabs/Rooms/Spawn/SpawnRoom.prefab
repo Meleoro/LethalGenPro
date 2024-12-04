@@ -47,8 +47,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 154603bf4bd46734b8fc072cdba750c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isStairRoom: 0
+  isConnected: 0
   corridorSpotsParent: {fileID: 6453134395077130843}
   groundTilesParent: {fileID: 6525325561414704190}
+  wallGameObject: {fileID: 8982833203608824873}
 --- !u!1 &1222131020999286421
 GameObject:
   m_ObjectHideFlags: 0
@@ -1086,6 +1089,11 @@ PrefabInstance:
 --- !u!4 &8115880532257497501 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1275700715095415947, guid: de7e7bd95140f5c41bc98a6ea4d422c0, type: 3}
+  m_PrefabInstance: {fileID: 6995591410058411286}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &8982833203608824873 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2142651733019332927, guid: de7e7bd95140f5c41bc98a6ea4d422c0, type: 3}
   m_PrefabInstance: {fileID: 6995591410058411286}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7167009378016651041

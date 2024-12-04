@@ -41,7 +41,7 @@ public class PathCalculator
         while (openList.Count != 0)
         {
             counter++;
-            if (counter > 15)
+            if (counter > 50)
             {
                 return new List<Vector3>();
             }
