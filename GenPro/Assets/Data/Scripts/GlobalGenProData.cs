@@ -13,4 +13,7 @@ public class GlobalGenProData : ScriptableObject
     public int floorNumber;
     public int minStairRoomsNumber;
     public int maxStairRoomsNumber;
+
+    [Header("Props")] 
+    [Range(0, 100)] public int propSpawnProba;
 }

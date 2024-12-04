@@ -13,9 +13,10 @@ MonoBehaviour:
   m_Name: Global1
   m_EditorClassIdentifier: 
   minRoomNumber: 5
-  maxRoomNumber: 8
-  roomSeparationMinDistance: 5
-  roomSeparationMaxDistance: 10
-  floorNumber: 8
-  minStairRoomsNumber: 3
-  maxStairRoomsNumber: 4
+  maxRoomNumber: 10
+  roomSeparationMinDistance: 0
+  roomSeparationMaxDistance: 5
+  floorNumber: 2
+  minStairRoomsNumber: 2
+  maxStairRoomsNumber: 3
+  propSpawnProba: 50

@@ -17,6 +17,9 @@ public class RoomCalculator
     private List<Vector3Int> takenTilesPositions = new List<Vector3Int>();
     private List<int> stairRoomIndexes = new List<int>();
 
+    [Header("Public Infos")] 
+    public int roomAmount;
+    
     
     public RoomCalculator(GlobalGenProData data, List<Room> previousFloorStairRooms, bool haveFloorUpside = false)
     {
@@ -24,20 +27,11 @@ public class RoomCalculator
         possibleStairsRooms = GenProManager.Instance.possibleStairsRooms;
         startRoom = GenProManager.Instance.startRoom;
         this.data = data;
-
         this.previousFloorStairRooms = previousFloorStairRooms.ToArray();
         mustGenerateStairs = haveFloorUpside;
-    }
-    
-    
-    // Returns the positions and prefab of the map rooms
-    public async Task<(Room[], Vector3[])> GenerateRoomPositions()
-    {
-        await Task.Yield();
         
-        int roomAmount = Random.Range(data.minRoomNumber, data.maxRoomNumber + 1);
-        Room[] rooms = new Room[roomAmount];
-        Vector3[] roomPositions = new Vector3[roomAmount];
+        
+        roomAmount = Random.Range(data.minRoomNumber, data.maxRoomNumber + 1);
         
         // We select at which indexes we will spawn stairs
         if (mustGenerateStairs)
@@ -45,48 +39,32 @@ public class RoomCalculator
             int stairRoomNumber = Random.Range(data.minStairRoomsNumber, data.maxStairRoomsNumber + 1);
             while (stairRoomIndexes.Count != stairRoomNumber)
             {
-                int pickedIndex = Random.Range(1, roomAmount);
+                int pickedIndex = Random.Range(0, roomAmount);
                 if (stairRoomIndexes.Contains(pickedIndex)) continue;
                 
                 stairRoomIndexes.Add(pickedIndex);
             }
         }
-
-        int startIndex = 0;
-
-        // We generate the spawn
-        if (GenProManager.Instance.currentFloorIndex == 0)
+        
+        if (GenProManager.Instance.currentFloorIndex != 0)
         {
-            startIndex++;
-            rooms[0] = startRoom;
-            roomPositions[0] = new Vector3(2000, GenProManager.Instance.currentFloorIndex * 4, 2000);
-            takenPositions.Add(roomPositions[0]);
-            
-            AddGroundTiles(roomPositions[0], rooms[0]);
-        }
-        else
-        {
-            for (int i = 0; i < previousFloorStairRooms.Length; i++)
+            for (int i = 0; i < this.previousFloorStairRooms.Length; i++)
             {
-                takenPositions.Add(previousFloorStairRooms[i].transform.position + new Vector3Int(0, 4, 0));
-                AddGroundTiles(previousFloorStairRooms[i].transform.position, previousFloorStairRooms[i]);
+                takenPositions.Add(this.previousFloorStairRooms[i].transform.position + new Vector3Int(0, 4, 0));
+                AddGroundTiles(this.previousFloorStairRooms[i].transform.position, this.previousFloorStairRooms[i]);
             }
         }
+    }
 
-        // We generate all the other rooms
-        for (int i = startIndex; i < roomAmount; i++)
-        {
-            Room currentRoom = GetCurrentRoom(i);
-            Vector3 currentPos = GetCurrentRoomPos(currentRoom);
+    public (Room, Vector3) GenerateRoomPosition(int index)
+    {
+        Room currentRoom = GetCurrentRoom(index);
+        Vector3 currentPos = GetCurrentRoomPos(currentRoom);
 
-            AddGroundTiles(currentPos, currentRoom);
-            
-            rooms[i] = currentRoom;
-            roomPositions[i] = currentPos;
-            takenPositions.Add(roomPositions[i]);
-        }
+        AddGroundTiles(currentPos, currentRoom);
+        takenPositions.Add(currentPos);
 
-        return (rooms, roomPositions);
+        return (currentRoom, currentPos);
     }
 
     
@@ -104,6 +82,11 @@ public class RoomCalculator
     private Vector3 GetCurrentRoomPos(Room wantedRoom)
     {
         int counter = 0;
+
+        if (takenPositions.Count == 0)
+        {
+            takenPositions.Add(new Vector3(2000, 0, 2000));
+        }
         
         while (true)
         {
@@ -114,7 +97,7 @@ public class RoomCalculator
                 return new Vector3();
             }
 
-            float amplitude = Random.Range(data.roomSeparationMinDistance + counter, data.roomSeparationMaxDistance + counter);
+            float amplitude = Random.Range(data.roomSeparationMinDistance + counter * 2, data.roomSeparationMaxDistance + counter * 2);
             Vector3 direction = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f));
             direction.Normalize();
             
@@ -122,20 +105,21 @@ public class RoomCalculator
             Vector3 finalPos = (refRoomPos + direction * amplitude);
             finalPos = new Vector3((int)finalPos.x, (int)finalPos.y, (int)finalPos.z);
             finalPos += new Vector3(finalPos.x % 2, finalPos.y % 2, finalPos.z % 2);
-                
+            
             if (VerifyRoomPos(finalPos, wantedRoom))
             {
                 return finalPos;
             }
         }
     }
-    
 
+    private Transform[] roomTiles;
+    private List<Vector3Int> roomTilePositions;
     private bool VerifyRoomPos(Vector3 wantedRoomPos, Room wantedRoom)
     {
-        Transform[] roomTiles = wantedRoom.GetGroundTiles();
-
-        List<Vector3Int> roomTilePositions = new List<Vector3Int>();
+        roomTiles = wantedRoom.GetGroundTiles();
+        roomTilePositions = new List<Vector3Int>();
+        
         for (int i = 0; i < roomTiles.Length; i++)
         {
             Vector3 tilePos = wantedRoomPos + roomTiles[i].localPosition;
@@ -164,7 +148,7 @@ public class RoomCalculator
 
     private void AddGroundTiles(Vector3 pos, Room room)
     {
-        Transform[] roomTiles = room.GetGroundTiles();
+        roomTiles = room.GetGroundTiles();
 
         for (int i = 0; i < roomTiles.Length; i++)
         {

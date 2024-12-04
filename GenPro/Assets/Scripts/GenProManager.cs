@@ -9,7 +9,7 @@ public class GenProManager : MonoBehaviour
     public static GenProManager Instance;
     
     [Header("Data")] 
-    [SerializeField] private GlobalGenProData data;
+    public GlobalGenProData data;
 
     [Header("Public Infos")]
     public List<Transform> corridorSpots;
@@ -24,6 +24,7 @@ public class GenProManager : MonoBehaviour
     public Room[] possibleRooms;
     public Room[] possibleStairsRooms;
     public Room startRoom;
+    public GameObject[] possibleProps;
     [SerializeField] private Corridor corridor;
     [SerializeField] private Transform floorParent;
     private RoomCalculator[] roomCalculators;
@@ -63,14 +64,14 @@ public class GenProManager : MonoBehaviour
             pathCalculators[i] = new PathCalculator();
             pathCalculators[i].InitialisePathCalculator();
             
+            
             StartNewFloor();
             
             roomCalculators[i] = new RoomCalculator(data, generatedRooms, i != data.floorNumber - 1);
             corridorCalculators[i] = new CorridorCalculator();
             
             await GenerateFloor();
-
-            await Task.Yield();
+            
         }
     }
 
@@ -99,7 +100,7 @@ public class GenProManager : MonoBehaviour
             }
             else
             {
-                generatedRooms[i].AddGroundTilesToPathfinding(true);
+                generatedRooms[i].AddGroundTilesToPathfinding();
             }
         }
     }
@@ -108,25 +109,31 @@ public class GenProManager : MonoBehaviour
     private async Task GenerateFloor()
     {
         await GenerateRooms();
+        
         await GenerateCorridors();
 
     }
 
     private async Task GenerateRooms()
     {
-        Room[] rooms;
-        Vector3[] roomPositions;
+        Room room;
+        Vector3 roomPosition;
         
-        (rooms, roomPositions) = await roomCalculators[currentFloorIndex].GenerateRoomPositions();
-        
-        for (int i = 0; i < rooms.Length; i++)
+        for (int i = 0; i < roomCalculators[currentFloorIndex].roomAmount; i++)
         {
-            Room newRoom = Instantiate(rooms[i], roomPositions[i], Quaternion.Euler(0, 0, 0), currentFloorParent);
-            generatedRooms.Add(newRoom);
-            generatedRooms[generatedRooms.Count - 1].GenerateCorridorSpots();
-            generatedRooms[generatedRooms.Count - 1].AddGroundTilesToPathfinding();
-            corridorSpots.AddRange(newRoom.GetCorridorsSpots());
+            (room, roomPosition) = roomCalculators[currentFloorIndex].GenerateRoomPosition(i);
 
+            Room newRoom = Instantiate(room, roomPosition, Quaternion.Euler(0, 0, 0), currentFloorParent);
+            generatedRooms.Add(newRoom);
+
+            newRoom.GenerateCorridorSpots();
+            newRoom.AddGroundTilesToPathfinding();
+            
+            newRoom.GenerateProps();
+            corridorSpots.AddRange(newRoom.GetCorridorsSpots());
+            
+            Debug.Log(corridorSpots.Count);
+            
             await Task.Yield();
         }
     }
@@ -134,6 +141,7 @@ public class GenProManager : MonoBehaviour
     private async Task GenerateCorridors()
     {
         List<Vector3> corridorsPositions = new List<Vector3>();
+        List<Vector3> bannedPositions = new List<Vector3>();
         generatedCorridors = new List<Corridor>();
         
         for (int i = 0; i < generatedRooms.Count; i++)
@@ -142,6 +150,9 @@ public class GenProManager : MonoBehaviour
             
             for (int j = 0; j < corridorsPositions.Count; j++)
             {
+                if (bannedPositions.Contains(corridorsPositions[j])) continue;
+                bannedPositions.Add(corridorsPositions[j]);
+                
                 Corridor newCorridor = Instantiate(corridor, corridorsPositions[j], Quaternion.Euler(0, 0, 0), currentFloorParent);
                 generatedCorridors.Add(newCorridor);
                 generatedCorridors[generatedCorridors.Count - 1].ActualiseWalls();
@@ -149,8 +160,7 @@ public class GenProManager : MonoBehaviour
             
             await Task.Yield();
         }
-        
-        Debug.Log("fdhgrz_hd");
+
         corridorCalculators[currentFloorIndex].ManageCorridorsNeighbors(generatedCorridors.ToList());
     }
 }

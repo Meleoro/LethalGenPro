@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class Room : MonoBehaviour
 {
@@ -14,6 +16,7 @@ public class Room : MonoBehaviour
     [Header("References")] 
     [SerializeField] private Transform corridorSpotsParent;
     [SerializeField] private Transform groundTilesParent;
+    [SerializeField] private Transform propSpotsParent;
     [SerializeField] private GameObject wallGameObject;
 
 
@@ -71,6 +74,26 @@ public class Room : MonoBehaviour
         Instantiate(wallGameObject, corridorSpotTr.position, corridorSpotTr.rotation * Quaternion.Euler(0, 90, 0));
     }
 
+
+    public void GenerateProps()
+    {
+        if (!propSpotsParent) return;
+        
+        List<Transform> propsSpots = new List<Transform>(propSpotsParent.GetComponentsInChildren<Transform>());
+        propsSpots.Remove(propSpotsParent);
+
+        for (int i = 0; i < propsSpots.Count; i++)
+        {
+            int pickedProba = Random.Range(0, 100);
+            if (pickedProba < GenProManager.Instance.data.propSpawnProba)
+            {
+                Instantiate(
+                    GenProManager.Instance.possibleProps[Random.Range(0, GenProManager.Instance.possibleProps.Length)],
+                    propsSpots[i].position, Quaternion.Euler(0, Random.Range(0, 360), 0));
+            }
+        }
+    }
+
     private bool VerifyNeighborMustBeBlocked(Vector3 tilePos)
     {
         for (int i = 0; i < corridorSpots.Length; i++)
@@ -85,6 +108,20 @@ public class Room : MonoBehaviour
 
         return true;
     }
+
+    /*private void OnDrawGizmos()
+    {
+        if (!propSpotsParent) return;
+        
+        List<Transform> propsSpots = new List<Transform>(propSpotsParent.GetComponentsInChildren<Transform>());
+        propsSpots.Remove(propSpotsParent);
+        
+        for (int i = 0; i < propsSpots.Count; i++)
+        {
+            Gizmos.color = new Color(255, 0, 0, 100);
+            Gizmos.DrawSphere(propsSpots[i].position, 0.5f);
+        }
+    }*/
 }
 
 public struct CorridorSpot

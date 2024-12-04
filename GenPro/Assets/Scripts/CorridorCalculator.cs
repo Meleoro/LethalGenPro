@@ -1,13 +1,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CorridorCalculator 
+public class CorridorCalculator
 {
+    private Corridor currentCorridor;
     public void ManageCorridorsNeighbors(List<Corridor> corridors)
     {
         for (int i = 0; i < corridors.Count; i++)
         {
-            Corridor currentCorridor = corridors[i];
+            currentCorridor = corridors[i];
 
             for (int j = 0; j < corridors.Count; j++)
             {
@@ -40,8 +41,6 @@ public class CorridorCalculator
 
         if (validRooms.Length == 0)
         {
-            Debug.Log("C'est la merde");
-
             if (!room.isConnected)
                 return GenerateRoomCorridors(room, otherRooms, maxCorridorLength + 15);
             
