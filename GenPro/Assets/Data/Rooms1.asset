@@ -21,6 +21,8 @@ MonoBehaviour:
   - {fileID: 3087748527995878274, guid: bb2ae9dab179de94590db30740491d72, type: 3}
   - {fileID: 3087748527995878274, guid: 3a481fd85ae0e62409b76ace11883dcc, type: 3}
   - {fileID: 3087748527995878274, guid: 468f6ede74de5f24ebaf708c7fb4082b, type: 3}
+  - {fileID: 3087748527995878274, guid: 2449f438ee04b4243a1d85373a46ebf4, type: 3}
+  - {fileID: 3087748527995878274, guid: e21dce33d6b9e124680626f7f021e203, type: 3}
   possiblesStairsRooms:
   - {fileID: 3087748527995878274, guid: 9973675368b0fc74cb963960681ffc58, type: 3}
   - {fileID: 3087748527995878274, guid: bd574edde4ba86d4c992c67952c34a19, type: 3}

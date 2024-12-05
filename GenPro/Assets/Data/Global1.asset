@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f4ed7826be0e424aab22d1b416045b8, type: 3}
   m_Name: Global1
   m_EditorClassIdentifier: 
-  minRoomNumber: 20
-  maxRoomNumber: 30
+  minRoomNumber: 30
+  maxRoomNumber: 40
   roomSeparationMinDistance: 0
   roomSeparationMaxDistance: 5
-  floorNumber: 4
+  floorNumber: 3
   minStairRoomsNumber: 2
   maxStairRoomsNumber: 3
   minUniqueRoomsNumber: 1
   maxUniqueRoomsNumber: 3
-  propSpawnProba: 50
+  propSpawnProba: 60

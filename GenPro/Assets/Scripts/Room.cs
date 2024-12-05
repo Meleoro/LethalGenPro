@@ -79,7 +79,7 @@ public class Room : MonoBehaviour
     {
         Transform corridorSpotTr = corridorSpots[index].transform;
 
-        GameObject newWall = Instantiate(wallGameObject, corridorSpotTr.position, corridorSpotTr.rotation * Quaternion.Euler(0, 90, 0));
+        GameObject newWall = Instantiate(wallGameObject, corridorSpotTr.position, corridorSpotTr.rotation * Quaternion.Euler(0, 90, 0), GenProManager.Instance.currentFloorParent);
         corridorBlockWalls[index] = newWall;
     }
 
@@ -107,7 +107,7 @@ public class Room : MonoBehaviour
             {
                 Instantiate(
                     GenProManager.Instance.roomsData.possibleProps[Random.Range(0, GenProManager.Instance.roomsData.possibleProps.Length)],
-                    propsSpots[i].position, Quaternion.Euler(0, Random.Range(0, 360), 0));
+                    propsSpots[i].position, Quaternion.Euler(0, Random.Range(0, 360), 0), GenProManager.Instance.currentFloorParent);
             }
         }
     }

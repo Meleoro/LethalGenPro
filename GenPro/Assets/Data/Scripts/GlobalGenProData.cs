@@ -4,15 +4,15 @@ using UnityEngine;
 public class GlobalGenProData : ScriptableObject
 {   
     [Header("Rooms Parameters")]
-    public int minRoomNumber;
-    public int maxRoomNumber;
+    [Range(5, 50)] public int minRoomNumber;
+    [Range(5, 50)] public int maxRoomNumber;
     public int roomSeparationMinDistance;
     public int roomSeparationMaxDistance;
 
     [Header("Floors Parameters")]
-    public int floorNumber;
-    public int minStairRoomsNumber;
-    public int maxStairRoomsNumber;
+    [Range(2, 8)] public int floorNumber;
+    [Range(1, 10)] public int minStairRoomsNumber;
+    [Range(1, 10)] public int maxStairRoomsNumber;
     
     [Header("Special Rooms Parameters")]
     public int minUniqueRoomsNumber;

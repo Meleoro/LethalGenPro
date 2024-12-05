@@ -53,17 +53,19 @@ public class RoomCalculator
             {
                 if (GenProManager.Instance.uniqueRoomsFloorIndexes[i] == GenProManager.Instance.currentFloorIndex)
                 {
-                    int antiCrashCounter = 0;
+                    int counter = 0;
                     
                     while (true)
                     {
-                        antiCrashCounter++;
-                        if (antiCrashCounter > 1000)
+                        counter++;
+                        // If there are not enough rooms available we add one
+                        if (counter > 200)
                         {
                             roomAmount++;
                             uniqueRoomIndexes.Add(roomAmount-1);
                         }
                         
+                        // We verify if this room isn't already special
                         int pickedIndex = Random.Range(0, roomAmount);
                         if (stairRoomIndexes.Contains(pickedIndex)) continue;
                         if (uniqueRoomIndexes.Contains(pickedIndex)) continue;
@@ -88,12 +90,14 @@ public class RoomCalculator
                     while (true)
                     {
                         antiCrashCounter++;
-                        if (antiCrashCounter > 1000)
+                        // If there are not enough rooms available we add one
+                        if (antiCrashCounter > 200)
                         {
                             roomAmount++;
                             neededRoomIndexes.Add(roomAmount-1);
                         }
                         
+                        // We verify if this room isn't already special
                         int pickedIndex = Random.Range(0, roomAmount);
                         if (stairRoomIndexes.Contains(pickedIndex)) continue;
                         if (uniqueRoomIndexes.Contains(pickedIndex)) continue;
@@ -106,6 +110,7 @@ public class RoomCalculator
             }
         }
         
+        // If this floor isn't the first, we add the stairs room of the previous stairs to the scripts
         if (GenProManager.Instance.currentFloorIndex != 0)
         {
             for (int i = 0; i < this.previousFloorStairRooms.Length; i++)
@@ -191,6 +196,7 @@ public class RoomCalculator
         }
     }
 
+    
     private Transform[] roomTiles;
     private List<Vector3Int> roomTilePositions;
     private bool VerifyRoomPos(Vector3 wantedRoomPos, Room wantedRoom)
@@ -224,6 +230,8 @@ public class RoomCalculator
         return true;
     }
 
+    
+    // Add ground tiles to avoid having two rooms into each others
     private void AddGroundTiles(Vector3 pos, Room room)
     {
         roomTiles = room.GetGroundTiles();
