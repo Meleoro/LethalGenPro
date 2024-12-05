@@ -17,16 +17,24 @@ public class Corridor : MonoBehaviour
         List<Transform> corridorSpots = GenProManager.Instance.corridorSpots;
         for (int i = 0; i < corridorSpots.Count; i++)
         {
-            if (corridorSpots[i].position == upWall.transform.position)
+            Vector2Int pos1 = new Vector2Int((int)corridorSpots[i].transform.position.x, (int)corridorSpots[i].transform.position.z);
+            Vector2Int pos2 = new Vector2Int((int)upWall.transform.position.x, (int)upWall.transform.position.z);
+            if (pos1 == pos2)
             {
                 upWall.SetActive(false);
-            } else if (corridorSpots[i].position == downWall.transform.position)
+            } 
+            pos2 = new Vector2Int((int)downWall.transform.position.x, (int)downWall.transform.position.z);
+            if (pos1 == pos2)
             {
                 downWall.SetActive(false);
-            } else if (corridorSpots[i].position == leftWall.transform.position)
+            } 
+            pos2 = new Vector2Int((int)leftWall.transform.position.x, (int)leftWall.transform.position.z);
+            if (pos1 == pos2)
             {
                 leftWall.SetActive(false);
-            } else if (corridorSpots[i].position == rightWall.transform.position)
+            } 
+            pos2 = new Vector2Int((int)rightWall.transform.position.x, (int)rightWall.transform.position.z);
+            if (pos1 == pos2)
             {
                 rightWall.SetActive(false);
             }

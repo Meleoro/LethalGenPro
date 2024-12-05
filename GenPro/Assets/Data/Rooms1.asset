@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e781db75f9f4d034d94cdaaa6c9c1e59, type: 3}
+  m_Name: Rooms1
+  m_EditorClassIdentifier: 
+  possiblesRooms:
+  - {fileID: 3087748527995878274, guid: b6839de30ae11ef40a6557d36bb3367a, type: 3}
+  - {fileID: 3087748527995878274, guid: 9680eb33791a38b44a7191fd5bb8e1d0, type: 3}
+  - {fileID: 3087748527995878274, guid: 8c3f17bac77935044b1c32184c15bbbd, type: 3}
+  - {fileID: 3087748527995878274, guid: 2287536fe5d949a4182a8d791ab194fb, type: 3}
+  - {fileID: 3087748527995878274, guid: b8d1a49b6ad211e4f8358bb374d69ae2, type: 3}
+  - {fileID: 3087748527995878274, guid: bb2ae9dab179de94590db30740491d72, type: 3}
+  - {fileID: 3087748527995878274, guid: 3a481fd85ae0e62409b76ace11883dcc, type: 3}
+  - {fileID: 3087748527995878274, guid: 468f6ede74de5f24ebaf708c7fb4082b, type: 3}
+  possiblesStairsRooms:
+  - {fileID: 3087748527995878274, guid: 9973675368b0fc74cb963960681ffc58, type: 3}
+  - {fileID: 3087748527995878274, guid: bd574edde4ba86d4c992c67952c34a19, type: 3}
+  possiblesUniqueRooms:
+  - {fileID: 3087748527995878274, guid: 03508d5b6550521459595ae7f394da60, type: 3}
+  - {fileID: 3087748527995878274, guid: 832ef35a772668242990d2c8cc280ae6, type: 3}
+  - {fileID: 3087748527995878274, guid: 34639ee6854c0ef45aae9033b4269576, type: 3}
+  neededRooms:
+  - {fileID: 3087748527995878274, guid: 80a7cf8d55d68894796838040d7b8204, type: 3}
+  - {fileID: 3087748527995878274, guid: 972bbbb80865c3548ba4593ac2208f20, type: 3}
+  possibleProps:
+  - {fileID: 4515025583184799490, guid: f326c8bc0502b324c9e6a019eda12fbb, type: 3}
+  - {fileID: 2327880647275010197, guid: c3f87d563c5bff0489189f8e93b8ee03, type: 3}
+  - {fileID: 5298338986528581689, guid: c2ce7d958b509884da10464401c5b29c, type: 3}
+  - {fileID: 4515025583184799490, guid: 55cc7cf1c97054d488dc4460f9501efe, type: 3}
+  - {fileID: 4515025583184799490, guid: 423dbeb6a5366bd46be04a00a65b63df, type: 3}
+  - {fileID: 2327880647275010197, guid: 6e7bd61d040345c44ad86468ae6f7d28, type: 3}
+  - {fileID: 4515025583184799490, guid: b3b20d60d97d0a54e9dd73f3f3a3555c, type: 3}

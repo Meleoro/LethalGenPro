@@ -1,17 +1,21 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 public class Room : MonoBehaviour
 {
     [Header("Parameters")] 
-    public bool isStairRoom;
+    public bool showGizmos;
     
     [Header("Public Infos")] 
     public CorridorSpot[] corridorSpots;
     public bool isConnected;
+
+    [Header("Private Infos")] 
+    private GameObject[] corridorBlockWalls;
     
     [Header("References")] 
     [SerializeField] private Transform corridorSpotsParent;
@@ -33,6 +37,7 @@ public class Room : MonoBehaviour
         transforms.Remove(corridorSpotsParent);
 
         corridorSpots = new CorridorSpot[transforms.Count];
+        corridorBlockWalls = new GameObject[transforms.Count];
         
         for (int i = 0; i < transforms.Count; i++)
         {
@@ -41,22 +46,25 @@ public class Room : MonoBehaviour
         }
     }
 
-    public void AddGroundTilesToPathfinding(bool noNeighbors = false)
+    public async Task AddGroundTilesToPathfinding(bool noNeighbors = false)
     {
         List<Transform> transforms = new List<Transform>(groundTilesParent.GetComponentsInChildren<Transform>());
         transforms.Remove(groundTilesParent);
         
         for (int i = 0; i < transforms.Count; i++)
         {
-            GenProManager.Instance.pathCalculators[GenProManager.Instance.currentFloorIndex].AddBlockedTile(transforms[i].position);
+            GenProManager.Instance.pathfindingScript.AddBlockedTile(transforms[i].position);
             
             if (noNeighbors) continue;
             if (VerifyNeighborMustBeBlocked(transforms[i].position)){
-                GenProManager.Instance.pathCalculators[GenProManager.Instance.currentFloorIndex].AddBlockedTile(transforms[i].position + Vector3.forward * 2);
-                GenProManager.Instance.pathCalculators[GenProManager.Instance.currentFloorIndex].AddBlockedTile(transforms[i].position + Vector3.back * 2);
-                GenProManager.Instance.pathCalculators[GenProManager.Instance.currentFloorIndex].AddBlockedTile(transforms[i].position + Vector3.left * 2);
-                GenProManager.Instance.pathCalculators[GenProManager.Instance.currentFloorIndex].AddBlockedTile(transforms[i].position + Vector3.right * 2);
+                GenProManager.Instance.pathfindingScript.AddBlockedTile(transforms[i].position + Vector3.forward * 2);
+                GenProManager.Instance.pathfindingScript.AddBlockedTile(transforms[i].position + Vector3.back * 2);
+                GenProManager.Instance.pathfindingScript.AddBlockedTile(transforms[i].position + Vector3.left * 2);
+                GenProManager.Instance.pathfindingScript.AddBlockedTile(transforms[i].position + Vector3.right * 2);
             }
+
+            if(i % 100 == 0)
+                await Task.Yield();
         }
     }
 
@@ -71,7 +79,17 @@ public class Room : MonoBehaviour
     {
         Transform corridorSpotTr = corridorSpots[index].transform;
 
-        Instantiate(wallGameObject, corridorSpotTr.position, corridorSpotTr.rotation * Quaternion.Euler(0, 90, 0));
+        GameObject newWall = Instantiate(wallGameObject, corridorSpotTr.position, corridorSpotTr.rotation * Quaternion.Euler(0, 90, 0));
+        corridorBlockWalls[index] = newWall;
+    }
+
+    public void ConnectCorridor(int index)
+    {
+        if (corridorBlockWalls[index] != null)
+        {
+            Destroy(corridorBlockWalls[index]);
+            corridorBlockWalls[index] = null;
+        }
     }
 
 
@@ -85,10 +103,10 @@ public class Room : MonoBehaviour
         for (int i = 0; i < propsSpots.Count; i++)
         {
             int pickedProba = Random.Range(0, 100);
-            if (pickedProba < GenProManager.Instance.data.propSpawnProba)
+            if (pickedProba < GenProManager.Instance.genProData.propSpawnProba)
             {
                 Instantiate(
-                    GenProManager.Instance.possibleProps[Random.Range(0, GenProManager.Instance.possibleProps.Length)],
+                    GenProManager.Instance.roomsData.possibleProps[Random.Range(0, GenProManager.Instance.roomsData.possibleProps.Length)],
                     propsSpots[i].position, Quaternion.Euler(0, Random.Range(0, 360), 0));
             }
         }
@@ -109,8 +127,10 @@ public class Room : MonoBehaviour
         return true;
     }
 
-    /*private void OnDrawGizmos()
+    private void OnDrawGizmos()
     {
+        if (Application.isPlaying) return;
+        if (!showGizmos) return;
         if (!propSpotsParent) return;
         
         List<Transform> propsSpots = new List<Transform>(propSpotsParent.GetComponentsInChildren<Transform>());
@@ -121,7 +141,7 @@ public class Room : MonoBehaviour
             Gizmos.color = new Color(255, 0, 0, 100);
             Gizmos.DrawSphere(propsSpots[i].position, 0.5f);
         }
-    }*/
+    }
 }
 
 public struct CorridorSpot

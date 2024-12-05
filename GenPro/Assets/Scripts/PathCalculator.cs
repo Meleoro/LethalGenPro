@@ -1,11 +1,12 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class PathCalculator
 {
     private PathfindingTile[,] tiles = new PathfindingTile[2000, 2000];
 
-    public void InitialisePathCalculator()
+    public async Task InitialisePathCalculator()
     {
         tiles = new PathfindingTile[2000, 2000];
         
@@ -17,6 +18,23 @@ public class PathCalculator
                 tiles[x, y].coord = new Vector2Int(x, y);
                 tiles[x, y].isBlocked = false;
             }
+
+            if(x % 50 == 0)
+                await Task.Yield();
+        }
+    }
+
+    public async Task ResetPathCalculator()
+    {
+        for (int x = 0; x < 2000; x++)
+        {
+            for (int y = 0; y < 2000; y++)
+            {
+                tiles[x, y].isBlocked = false;
+            }
+
+            if(x % 200 == 0)
+                await Task.Yield();
         }
     }
     
@@ -41,7 +59,7 @@ public class PathCalculator
         while (openList.Count != 0)
         {
             counter++;
-            if (counter > 50)
+            if (counter > 100)
             {
                 return new List<Vector3>();
             }

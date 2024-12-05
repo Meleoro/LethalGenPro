@@ -41,17 +41,7 @@ public class CorridorCalculator
 
         if (validRooms.Length == 0)
         {
-            if (!room.isConnected)
-                return GenerateRoomCorridors(room, otherRooms, maxCorridorLength + 15);
-            
-            for (int i = 0; i < room.corridorSpots.Length; i++)
-            {
-                if(!room.corridorSpots[i].hasCorridor)
-                    room.ReplaceCorridorSpot(i);
-                room.corridorSpots[i].hasCorridor = true;
-            }
-            
-            return new List<Vector3>();
+            return GenerateRoomCorridors(room, otherRooms, maxCorridorLength + 15);
         }
         
         for (int i = 0; i < room.corridorSpots.Length; i++)
@@ -61,12 +51,13 @@ public class CorridorCalculator
             
             Vector3 pos1 = room.corridorSpots[i].transform.forward + room.corridorSpots[i].transform.position;
             Vector3 pos2 = Vector3.zero;
-            CorridorSpot wantedSpot;
+            CorridorSpot wantedSpot = new CorridorSpot();
             
             int counter = 0;
             
             bool found = false;
             Room pickedRoom = null;
+            int pickedIndex = 0;
             
             while (true)
             {
@@ -80,14 +71,15 @@ public class CorridorCalculator
                     //if (pickedRoom.corridorSpots[j].hasCorridor) continue;
                     if (pickedRoom.corridorSpots[j].transform.position.y > 1 + GenProManager.Instance.currentFloorIndex * 4) continue;
                     if (Mathf.Abs(pickedRoom.corridorSpots[j].transform.position.y - room.corridorSpots[i].transform.position.y) > 1) continue;
+                    if (!pickedRoom.isConnected) continue;
 
                     pos2 = pickedRoom.corridorSpots[j].transform.position + pickedRoom.corridorSpots[j].transform.forward;
                     wantedSpot = pickedRoom.corridorSpots[j];
                     found = true;
+                    pickedIndex = j;
                     
-                    List<Vector3> testPath = GenProManager.Instance.pathCalculators[GenProManager.Instance.currentFloorIndex]
-                        .GetPath(pos1, pos2);
-                    if (testPath.Count < maxCorridorLength)
+                    List<Vector3> testPath = GenProManager.Instance.pathfindingScript.GetPath(pos1, pos2);
+                    if (testPath.Count < maxCorridorLength || testPath.Count == 0)
                         continue;
                     
                     break;
@@ -96,20 +88,20 @@ public class CorridorCalculator
                 if (found) break;
             }
 
-            List<Vector3> path = GenProManager.Instance.pathCalculators[GenProManager.Instance.currentFloorIndex].GetPath(pos1, pos2);
+            List<Vector3> path = GenProManager.Instance.pathfindingScript.GetPath(pos1, pos2);
             if (path.Count == 0 && room.isConnected)
             {
                 room.ReplaceCorridorSpot(i);
-                wantedSpot.hasCorridor = false;
                 room.corridorSpots[i].hasCorridor = true;
             }
             else if (path.Count != 0)
             {
                 room.isConnected = true;
-                pickedRoom.isConnected = true;
                 wantedSpot.hasCorridor = true;
                 room.corridorSpots[i].hasCorridor = true;
                 tilePositions.AddRange(path);
+
+                pickedRoom.ConnectCorridor(pickedIndex);
             }
         }
 

@@ -9,13 +9,14 @@ public class RoomCalculator
     private Room[] possibleRooms;
     private Room[] possibleStairsRooms;
     private Room[] previousFloorStairRooms;
-    private Room startRoom;
     private bool mustGenerateStairs;
 
     [Header("Private Infos")] 
     private List<Vector3> takenPositions = new List<Vector3>();
     private List<Vector3Int> takenTilesPositions = new List<Vector3Int>();
     private List<int> stairRoomIndexes = new List<int>();
+    private List<int> uniqueRoomIndexes = new List<int>();
+    private List<int> neededRoomIndexes = new List<int>();
 
     [Header("Public Infos")] 
     public int roomAmount;
@@ -23,9 +24,8 @@ public class RoomCalculator
     
     public RoomCalculator(GlobalGenProData data, List<Room> previousFloorStairRooms, bool haveFloorUpside = false)
     {
-        possibleRooms = GenProManager.Instance.possibleRooms;
-        possibleStairsRooms = GenProManager.Instance.possibleStairsRooms;
-        startRoom = GenProManager.Instance.startRoom;
+        possibleRooms = GenProManager.Instance.roomsData.possiblesRooms;
+        possibleStairsRooms = GenProManager.Instance.roomsData.possiblesStairsRooms;
         this.data = data;
         this.previousFloorStairRooms = previousFloorStairRooms.ToArray();
         mustGenerateStairs = haveFloorUpside;
@@ -43,6 +43,66 @@ public class RoomCalculator
                 if (stairRoomIndexes.Contains(pickedIndex)) continue;
                 
                 stairRoomIndexes.Add(pickedIndex);
+            }
+        }
+
+        // We select at which indexes we will spawn unique rooms
+        if (GenProManager.Instance.uniqueRoomsFloorIndexes.Contains(GenProManager.Instance.currentFloorIndex))
+        {
+            for (int i = 0; i < GenProManager.Instance.uniqueRoomsFloorIndexes.Count; i++)
+            {
+                if (GenProManager.Instance.uniqueRoomsFloorIndexes[i] == GenProManager.Instance.currentFloorIndex)
+                {
+                    int antiCrashCounter = 0;
+                    
+                    while (true)
+                    {
+                        antiCrashCounter++;
+                        if (antiCrashCounter > 1000)
+                        {
+                            roomAmount++;
+                            uniqueRoomIndexes.Add(roomAmount-1);
+                        }
+                        
+                        int pickedIndex = Random.Range(0, roomAmount);
+                        if (stairRoomIndexes.Contains(pickedIndex)) continue;
+                        if (uniqueRoomIndexes.Contains(pickedIndex)) continue;
+                
+                        uniqueRoomIndexes.Add(pickedIndex);
+                        break;
+                    }
+                }
+            }
+        }
+        
+        
+        // We select at which indexes we will spawn needed rooms
+        if (GenProManager.Instance.neededRoomsFloorIndexes.Contains(GenProManager.Instance.currentFloorIndex))
+        {
+            for (int i = 0; i < GenProManager.Instance.neededRoomsFloorIndexes.Count; i++)
+            {
+                if (GenProManager.Instance.neededRoomsFloorIndexes[i] == GenProManager.Instance.currentFloorIndex)
+                {
+                    int antiCrashCounter = 0;
+                    
+                    while (true)
+                    {
+                        antiCrashCounter++;
+                        if (antiCrashCounter > 1000)
+                        {
+                            roomAmount++;
+                            neededRoomIndexes.Add(roomAmount-1);
+                        }
+                        
+                        int pickedIndex = Random.Range(0, roomAmount);
+                        if (stairRoomIndexes.Contains(pickedIndex)) continue;
+                        if (uniqueRoomIndexes.Contains(pickedIndex)) continue;
+                        if (neededRoomIndexes.Contains(pickedIndex)) continue;
+                
+                        neededRoomIndexes.Add(pickedIndex);
+                        break;
+                    }
+                }
             }
         }
         
@@ -74,6 +134,24 @@ public class RoomCalculator
         {
             return possibleStairsRooms[Random.Range(0, possibleStairsRooms.Length)];
         }
+
+        if (uniqueRoomIndexes.Contains(currentRoomIndex))
+        {
+            int pickedIndex = Random.Range(0, GenProManager.Instance.remainingUniqueRooms.Count);
+            Room pickedRoom = GenProManager.Instance.remainingUniqueRooms[pickedIndex];
+            GenProManager.Instance.SpawnUniqueRoom(pickedIndex);
+            
+            return pickedRoom;
+        }
+        
+        if (neededRoomIndexes.Contains(currentRoomIndex))
+        {
+            int pickedIndex = Random.Range(0, GenProManager.Instance.remainingNeededRooms.Count);
+            Room pickedRoom = GenProManager.Instance.remainingNeededRooms[pickedIndex];
+            GenProManager.Instance.SpawnNeededRoom(pickedIndex);
+            
+            return pickedRoom;
+        }
         
         return possibleRooms[Random.Range(0, possibleRooms.Length)];
     }
@@ -93,11 +171,11 @@ public class RoomCalculator
             counter++;
             if (counter > 50)
             {
-                Debug.LogError("Aidez-moi");
+                Debug.LogError("No possible position for a room found");
                 return new Vector3();
             }
 
-            float amplitude = Random.Range(data.roomSeparationMinDistance + counter * 2, data.roomSeparationMaxDistance + counter * 2);
+            float amplitude = Random.Range(data.roomSeparationMinDistance + counter, data.roomSeparationMaxDistance + counter);
             Vector3 direction = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f));
             direction.Normalize();
             

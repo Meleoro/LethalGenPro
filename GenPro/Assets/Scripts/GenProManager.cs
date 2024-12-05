@@ -3,17 +3,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class GenProManager : MonoBehaviour
 {
     public static GenProManager Instance;
     
     [Header("Data")] 
-    public GlobalGenProData data;
+    public GlobalGenProData genProData;
+    public PossibleRoomsData roomsData;
 
     [Header("Public Infos")]
-    public List<Transform> corridorSpots;
-    public int currentFloorIndex;
+    [HideInInspector] public List<Transform> corridorSpots;
+    [HideInInspector] public List<int> neededRoomsFloorIndexes;
+    [HideInInspector] public List<int> uniqueRoomsFloorIndexes;
+    [HideInInspector] public int currentFloorIndex;
+    [HideInInspector] public List<Room> remainingUniqueRooms;
+    [HideInInspector] public List<Room> remainingNeededRooms;
     
     [Header("Private Infos")] 
     private List<Room> generatedRooms;
@@ -21,15 +27,11 @@ public class GenProManager : MonoBehaviour
     private Transform currentFloorParent;
     
     [Header("References")]
-    public Room[] possibleRooms;
-    public Room[] possibleStairsRooms;
-    public Room startRoom;
-    public GameObject[] possibleProps;
     [SerializeField] private Corridor corridor;
     [SerializeField] private Transform floorParent;
     private RoomCalculator[] roomCalculators;
     private CorridorCalculator[] corridorCalculators;
-    public PathCalculator[] pathCalculators;
+    public PathCalculator pathfindingScript;
 
 
     private void Awake()
@@ -51,23 +53,41 @@ public class GenProManager : MonoBehaviour
 
     private async Task GenerateMap()
     {
-        roomCalculators = new RoomCalculator[data.floorNumber];
-        corridorCalculators = new CorridorCalculator[data.floorNumber];
-        pathCalculators = new PathCalculator[data.floorNumber];
+        roomCalculators = new RoomCalculator[genProData.floorNumber];
+        corridorCalculators = new CorridorCalculator[genProData.floorNumber];
+        pathfindingScript = new PathCalculator();
         generatedRooms = new List<Room>();
+
+        neededRoomsFloorIndexes = new List<int>();
+        uniqueRoomsFloorIndexes = new List<int>();
+        remainingNeededRooms = roomsData.neededRooms.ToList();
+        remainingUniqueRooms = roomsData.possiblesUniqueRooms.ToList();
         
-        for (int i = 0; i < data.floorNumber; i++)
+        int uniqueRoomAmount = Random.Range(genProData.minUniqueRoomsNumber, genProData.maxUniqueRoomsNumber);
+        if (uniqueRoomAmount > roomsData.possiblesUniqueRooms.Length) uniqueRoomAmount = roomsData.possiblesUniqueRooms.Length;
+        for(int i = 0; i < uniqueRoomAmount; i++)
+        {
+            int randomFloor = Random.Range(0, genProData.floorNumber);
+            uniqueRoomsFloorIndexes.Add(randomFloor);
+        }
+        
+        for(int i = 0; i < roomsData.neededRooms.Length; i++)
+        {
+            int randomFloor = Random.Range(0, genProData.floorNumber);
+            neededRoomsFloorIndexes.Add(randomFloor);
+        }
+        
+        await pathfindingScript.InitialisePathCalculator();
+        
+        for (int i = 0; i < genProData.floorNumber; i++)
         {
             currentFloorParent = Instantiate(floorParent);
             currentFloorIndex = i;
             
-            pathCalculators[i] = new PathCalculator();
-            pathCalculators[i].InitialisePathCalculator();
+            await pathfindingScript.ResetPathCalculator();
+            await StartNewFloor();
             
-            
-            StartNewFloor();
-            
-            roomCalculators[i] = new RoomCalculator(data, generatedRooms, i != data.floorNumber - 1);
+            roomCalculators[i] = new RoomCalculator(genProData, generatedRooms, i != genProData.floorNumber - 1);
             corridorCalculators[i] = new CorridorCalculator();
             
             await GenerateFloor();
@@ -75,7 +95,7 @@ public class GenProManager : MonoBehaviour
         }
     }
 
-    private void StartNewFloor()
+    private async Task StartNewFloor()
     {
         corridorSpots.Clear();
 
@@ -100,7 +120,7 @@ public class GenProManager : MonoBehaviour
             }
             else
             {
-                generatedRooms[i].AddGroundTilesToPathfinding();
+                await generatedRooms[i].AddGroundTilesToPathfinding(true);
             }
         }
     }
@@ -116,8 +136,8 @@ public class GenProManager : MonoBehaviour
 
     private async Task GenerateRooms()
     {
-        Room room;
-        Vector3 roomPosition;
+        Room room = null;
+        Vector3 roomPosition = Vector3.zero;
         
         for (int i = 0; i < roomCalculators[currentFloorIndex].roomAmount; i++)
         {
@@ -126,15 +146,14 @@ public class GenProManager : MonoBehaviour
             Room newRoom = Instantiate(room, roomPosition, Quaternion.Euler(0, 0, 0), currentFloorParent);
             generatedRooms.Add(newRoom);
 
+            if (i == 0)
+                newRoom.isConnected = true;
+
             newRoom.GenerateCorridorSpots();
-            newRoom.AddGroundTilesToPathfinding();
+            await newRoom.AddGroundTilesToPathfinding();
             
             newRoom.GenerateProps();
             corridorSpots.AddRange(newRoom.GetCorridorsSpots());
-            
-            Debug.Log(corridorSpots.Count);
-            
-            await Task.Yield();
         }
     }
     
@@ -162,5 +181,16 @@ public class GenProManager : MonoBehaviour
         }
 
         corridorCalculators[currentFloorIndex].ManageCorridorsNeighbors(generatedCorridors.ToList());
+    }
+
+
+    public void SpawnUniqueRoom(int index)
+    {
+        remainingUniqueRooms.RemoveAt(index);
+    }
+
+    public void SpawnNeededRoom(int index)
+    {
+        remainingNeededRooms.RemoveAt(index);
     }
 }
