@@ -133,6 +133,7 @@ public class RoomCalculator
     }
 
     
+    // Gets the current room prefab
     private Room GetCurrentRoom(int currentRoomIndex)
     {
         if (stairRoomIndexes.Contains(currentRoomIndex))
@@ -180,15 +181,16 @@ public class RoomCalculator
                 return new Vector3();
             }
 
-            float amplitude = Random.Range(data.roomSeparationMinDistance + counter, data.roomSeparationMaxDistance + counter);
+            // We take a random room position and add a random dir with a random magnitude
+            float amplitude = Random.Range(counter, 5 + counter);
             Vector3 direction = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f));
             direction.Normalize();
-            
             Vector3 refRoomPos = takenPositions[Random.Range(0, takenPositions.Count)];
             Vector3 finalPos = (refRoomPos + direction * amplitude);
             finalPos = new Vector3((int)finalPos.x, (int)finalPos.y, (int)finalPos.z);
             finalPos += new Vector3(finalPos.x % 2, finalPos.y % 2, finalPos.z % 2);
             
+            // If there isn't already a room at this spot
             if (VerifyRoomPos(finalPos, wantedRoom))
             {
                 return finalPos;

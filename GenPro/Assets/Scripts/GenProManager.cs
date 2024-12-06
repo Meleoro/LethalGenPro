@@ -20,11 +20,11 @@ public class GenProManager : MonoBehaviour
     [HideInInspector] public int currentFloorIndex;
     [HideInInspector] public List<Room> remainingUniqueRooms;
     [HideInInspector] public List<Room> remainingNeededRooms;
+    [HideInInspector] public Transform currentFloorParent;
     
     [Header("Private Infos")] 
     private List<Room> generatedRooms;
     private List<Corridor> generatedCorridors;
-    public Transform currentFloorParent;
     
     [Header("References")]
     [SerializeField] private Corridor corridor;
@@ -42,9 +42,9 @@ public class GenProManager : MonoBehaviour
             Destroy(gameObject);
     }
 
-    private async void Start()
+    private void Start()
     {
-        await GenerateMap();
+        GenerateMap();
     }
 
     private async Task GenerateMap()
@@ -188,7 +188,7 @@ public class GenProManager : MonoBehaviour
             await Task.Yield();
         }
 
-        corridorCalculators[currentFloorIndex].ManageCorridorsNeighbors(generatedCorridors.ToList());   // Remove walls connected to other corridors
+        await corridorCalculators[currentFloorIndex].ManageCorridorsNeighbors(generatedCorridors.ToList());   // Remove walls connected to other corridors
     }
 
     #endregion

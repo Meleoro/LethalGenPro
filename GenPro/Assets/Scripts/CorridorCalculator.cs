@@ -1,10 +1,13 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class CorridorCalculator
 {
     private Corridor currentCorridor;
-    public void ManageCorridorsNeighbors(List<Corridor> corridors)
+    
+    // Deactivates walls according to the corridors neighbors
+    public async Task ManageCorridorsNeighbors(List<Corridor> corridors)
     {
         for (int i = 0; i < corridors.Count; i++)
         {
@@ -31,6 +34,8 @@ public class CorridorCalculator
                     currentCorridor.downWall.SetActive(false);
                 } 
             }
+
+            if (i % 40 == 0) await Task.Yield();
         }
     }
     
@@ -44,6 +49,7 @@ public class CorridorCalculator
             return GenerateRoomCorridors(room, otherRooms, maxCorridorLength + 15);
         }
         
+        // For every possible corridor spot of this room
         for (int i = 0; i < room.corridorSpots.Length; i++)
         {
             if (room.corridorSpots[i].hasCorridor) continue;
@@ -52,9 +58,7 @@ public class CorridorCalculator
             Vector3 pos1 = room.corridorSpots[i].transform.forward + room.corridorSpots[i].transform.position;
             Vector3 pos2 = Vector3.zero;
             CorridorSpot wantedSpot = new CorridorSpot();
-            
             int counter = 0;
-            
             bool found = false;
             Room pickedRoom = null;
             int pickedIndex = 0;
@@ -68,7 +72,6 @@ public class CorridorCalculator
                 
                 for (int j = 0; j < pickedRoom.corridorSpots.Length; j++)
                 {
-                    //if (pickedRoom.corridorSpots[j].hasCorridor) continue;
                     if (pickedRoom.corridorSpots[j].transform.position.y > 1 + GenProManager.Instance.currentFloorIndex * 4) continue;
                     if (Mathf.Abs(pickedRoom.corridorSpots[j].transform.position.y - room.corridorSpots[i].transform.position.y) > 1) continue;
                     if (!pickedRoom.isConnected) continue;
@@ -78,7 +81,7 @@ public class CorridorCalculator
                     found = true;
                     pickedIndex = j;
                     
-                    List<Vector3> testPath = GenProManager.Instance.pathfindingScript.GetPath(pos1, pos2);
+                    List<Vector3> testPath = GenProManager.Instance.pathfindingScript.GetPath(pos1, pos2);     // Use the pathfinding algo to find the path between the two corridors spots
                     if (testPath.Count < maxCorridorLength || testPath.Count == 0)
                         continue;
                     
@@ -88,13 +91,14 @@ public class CorridorCalculator
                 if (found) break;
             }
 
-            List<Vector3> path = GenProManager.Instance.pathfindingScript.GetPath(pos1, pos2);
+            List<Vector3> path = GenProManager.Instance.pathfindingScript.GetPath(pos1, pos2);     // Use the pathfinding algo to find the path between the two corridors spots
+            // If the path isn't valid but this room has already connections, we close this corridor spot
             if (path.Count == 0 && room.isConnected)
             {
                 room.ReplaceCorridorSpot(i);
                 room.corridorSpots[i].hasCorridor = true;
             }
-            else if (path.Count != 0)
+            else if (path.Count != 0)     // If the path is valid
             {
                 room.isConnected = true;
                 wantedSpot.hasCorridor = true;
@@ -114,6 +118,7 @@ public class CorridorCalculator
     }
 
 
+    // Gets rooms in a given range 
     private Room[] GetValidRooms(Room room, Room[] otherRooms, int maxDist)
     {
         List<Room> returnedList = new List<Room>();

@@ -44,6 +44,7 @@ public class PathCalculator
         tiles[(int)(pos.x * 0.5f), (int)(pos.z * 0.5f)].isBlocked = true;
     }
     
+    
     public List<Vector3> GetPath(Vector3 pos1, Vector3 pos2)
     {
         PathfindingTile start = tiles[(int)(pos1.x * 0.5f), (int)(pos1.z * 0.5f)];

@@ -12,6 +12,7 @@ public class Corridor : MonoBehaviour
     public GameObject leftWall;
     public GameObject rightWall;
 
+    // Removes walls in contact with a room's corridor spot
     public void ActualiseWalls()
     {
         List<Transform> corridorSpots = GenProManager.Instance.corridorSpots;
